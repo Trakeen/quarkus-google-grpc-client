@@ -13,6 +13,8 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+
 /**
  * Quarkus CDI service wrapping the Google Places API (New) gRPC interface.
  *
@@ -35,7 +37,7 @@ public class GooglePlacesService {
     private static final String PLACE_FIELDS =
             "id,displayName,formattedAddress,location,internationalPhoneNumber,rating,googleMapsUri";
 
-    /** Field mask for SearchNearby — same fields but prefixed with "places.". */
+    /** Field mask for SearchNearby / SearchText — same fields but prefixed with "places.". */
     private static final String NEARBY_FIELDS =
             "places.id,places.displayName,places.formattedAddress,places.location," +
             "places.internationalPhoneNumber,places.rating,places.googleMapsUri,places.types";
@@ -165,6 +167,53 @@ public class GooglePlacesService {
                 .build();
 
         final SearchNearbyResponse response = stub.searchNearby(request);
+
+        return response.getPlacesList().stream()
+                .map(this::toPlaceAddress)
+                .collect(Collectors.toList());
+    }
+
+    // -------------------------------------------------------------------------
+    // SearchText
+    // -------------------------------------------------------------------------
+
+    /**
+     * Searches for places matching a free-text query, biased around a location.
+     *
+     * @param query      Free-text query (e.g. POI name or address fragment).
+     * @param lat        Bias centre latitude.
+     * @param lng        Bias centre longitude.
+     * @param radiusM    Bias radius in metres.
+     * @param language   IETF language tag.
+     * @param maxResults Maximum number of results (1–20).
+     * @return List of matching {@link PlaceAddress}.
+     */
+    public List<PlaceAddress> searchText(
+            final String query,
+            final double lat,
+            final double lng,
+            final int radiusM,
+            final String language,
+            final int maxResults) {
+
+        final PlacesGrpc.PlacesBlockingStub stub = createStub(NEARBY_FIELDS);
+
+        final SearchTextRequest request = SearchTextRequest.newBuilder()
+                .setTextQuery(query)
+                .setLanguageCode(language)
+                .setMaxResultCount(Math.min(maxResults, 20))
+                .setLocationBias(SearchTextRequest.LocationBias.newBuilder()
+                        .setCircle(Circle.newBuilder()
+                                .setCenter(LatLng.newBuilder()
+                                        .setLatitude(lat)
+                                        .setLongitude(lng)
+                                        .build())
+                                .setRadius(radiusM)
+                                .build())
+                        .build())
+                .build();
+
+        final SearchTextResponse response = stub.searchText(request);
 
         return response.getPlacesList().stream()
                 .map(this::toPlaceAddress)
