@@ -54,7 +54,7 @@ Add the following to `application.properties`:
 ```properties
 quarkus.grpc.clients.google-places.host=places.googleapis.com
 quarkus.grpc.clients.google-places.port=443
-quarkus.grpc.clients.google-places.ssl=true
+quarkus.grpc.clients.google-places.plain-text=false
 ```
 
 ---
