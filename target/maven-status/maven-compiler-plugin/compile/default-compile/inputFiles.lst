@@ -1,0 +1,5 @@
+/Users/a/Documents/Dev/quarkus-google-grpc-client/src/main/java/io/quarkiverse/google/places/GoogleApiKeyInterceptor.java
+/Users/a/Documents/Dev/quarkus-google-grpc-client/src/main/java/io/quarkiverse/google/places/GoogleApiKeySupplier.java
+/Users/a/Documents/Dev/quarkus-google-grpc-client/src/main/java/io/quarkiverse/google/places/GooglePlacesService.java
+/Users/a/Documents/Dev/quarkus-google-grpc-client/src/main/java/io/quarkiverse/google/places/model/PlaceAddress.java
+/Users/a/Documents/Dev/quarkus-google-grpc-client/src/main/java/io/quarkiverse/google/places/model/PlaceSuggestion.java

@@ -1,0 +1,8 @@
+io/quarkiverse/google/places/model/PlaceAddress$PlaceAddressBuilder.class
+io/quarkiverse/google/places/GoogleApiKeyInterceptor.class
+io/quarkiverse/google/places/model/PlaceSuggestion.class
+io/quarkiverse/google/places/GooglePlacesService.class
+io/quarkiverse/google/places/GoogleApiKeySupplier.class
+io/quarkiverse/google/places/model/PlaceSuggestion$PlaceSuggestionBuilder.class
+io/quarkiverse/google/places/GoogleApiKeyInterceptor$1.class
+io/quarkiverse/google/places/model/PlaceAddress.class
