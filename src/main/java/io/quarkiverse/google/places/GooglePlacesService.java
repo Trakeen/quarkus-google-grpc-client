@@ -3,12 +3,12 @@ package io.quarkiverse.google.places;
 import com.google.maps.places.v1.*;
 import com.google.type.LatLng;
 import io.grpc.Channel;
-import io.grpc.ClientInterceptors;
+import io.grpc.Metadata;
 import io.quarkus.grpc.GrpcClient;
+import io.grpc.stub.MetadataUtils;
 import io.quarkiverse.google.places.model.PlaceAddress;
 import io.quarkiverse.google.places.model.PlaceSuggestion;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,11 +42,11 @@ public class GooglePlacesService {
             "places.id,places.displayName,places.formattedAddress,places.location," +
             "places.internationalPhoneNumber,places.rating,places.googleMapsUri,places.types";
 
+    private static final Metadata.Key<String> FIELD_MASK =
+            Metadata.Key.of("x-goog-fieldmask", Metadata.ASCII_STRING_MARSHALLER);
+
     @GrpcClient("google-places")
     Channel channel;
-
-    @Inject
-    GoogleApiKeySupplier apiKeySupplier;
 
     // -------------------------------------------------------------------------
     // AutocompletePlaces
@@ -225,8 +225,13 @@ public class GooglePlacesService {
     // -------------------------------------------------------------------------
 
     private PlacesGrpc.PlacesBlockingStub createStub(final String fieldMask) {
-        return PlacesGrpc.newBlockingStub(
-                ClientInterceptors.intercept(channel, new GoogleApiKeyInterceptor(apiKeySupplier, fieldMask)));
+        PlacesGrpc.PlacesBlockingStub stub = PlacesGrpc.newBlockingStub(channel);
+        if (fieldMask != null && !fieldMask.isBlank()) {
+            final Metadata headers = new Metadata();
+            headers.put(FIELD_MASK, fieldMask);
+            stub = stub.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
+        }
+        return stub;
     }
 
     private PlaceAddress toPlaceAddress(final Place place) {
